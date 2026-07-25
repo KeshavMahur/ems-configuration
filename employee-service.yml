@@ -12,3 +12,47 @@ spring:
 
   server:
     port: 8082
+
+
+  resilience4j:
+  circuitbreaker:
+    instances:
+      departmentService:
+        registerHealthIndicator: true
+        slidingWindowType: COUNT_BASED
+        slidingWindowSize: 10          # last 10 calls track karega
+        minimumNumberOfCalls: 5        # kam se kam 5 calls hone ke baad hi decide karega
+        failureRateThreshold: 50       # agar 50% calls fail huye toh OPEN
+        waitDurationInOpenState: 10s   # 10 sec baad HALF_OPEN try karega
+        permittedNumberOfCallsInHalfOpenState: 3
+        automaticTransitionFromOpenToHalfOpenEnabled: true
+        slowCallRateThreshold: 80
+        slowCallDurationThreshold: 3s  # 3 sec se zyada = slow call maana jayega
+
+  ratelimiter:
+    instances:
+      departmentService:
+        limitForPeriod: 10             # 1 sec mein max 10 calls allowed
+        limitRefreshPeriod: 1s
+        timeoutDuration: 2s            # agar permit nahi mila toh 2 sec wait karega
+
+  retry:
+    instances:
+      departmentService:
+        maxAttempts: 3
+        waitDuration: 1s
+        retryExceptions:
+          - java.io.IOException
+          - feign.RetryableException
+        ignoreExceptions:
+           # Dynamic registry se structured client exceptions (jaise DEPT_404):
+          - com.keshav.ems.employeeservice.exceptions.client.DepartmentNotFoundException
+          
+          # Feign decoder ki fallback/unknown exception (Empty body, JSON parsing fail, etc.):
+          - com.keshav.ems.employeeservice.exceptions.custom.UnknownFeignException
+
+  bulkhead:
+    instances:
+      departmentService:
+        maxConcurrentCalls: 15
+        maxWaitDuration: 500ms
