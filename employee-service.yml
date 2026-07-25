@@ -14,7 +14,7 @@ spring:
     port: 8082
 
 
-  resilience4j:
+resilience4j:
   circuitbreaker:
     instances:
       departmentService:
