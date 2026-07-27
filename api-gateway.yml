@@ -12,16 +12,20 @@ spring:
           enabled: false
 
       routes:
+
+        # Test Route
         - id: google
           uri: https://www.google.com
           predicates:
             - Path=/google
-            
+
+        # Employee Service
         - id: employee-service
           uri: lb://EMPLOYEE-SERVICE
           predicates:
             - Path=/employees/**
 
+        # Department Service
         - id: department-service
           uri: lb://DEPARTMENT-SERVICE
           predicates:
@@ -38,7 +42,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: health,info,gateway
+        include: "*"
 
   endpoint:
     health:
