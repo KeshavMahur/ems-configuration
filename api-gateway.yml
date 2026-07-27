@@ -12,6 +12,11 @@ spring:
           enabled: false
 
       routes:
+        - id: google
+          uri: https://www.google.com
+          predicates:
+            - Path=/google
+            
         - id: employee-service
           uri: lb://EMPLOYEE-SERVICE
           predicates:
