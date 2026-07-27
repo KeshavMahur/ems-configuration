@@ -1,15 +1,17 @@
+server:
+  port: 8082
+
 spring:
+  application:
+    name: EMPLOYEE-SERVICE
 
   kafka:
-
     bootstrap-servers: localhost:9092
 
     producer:
-
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
-
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-  
+
   datasource:
     url: jdbc:mysql://localhost:3306/employee_service_db?createDatabaseIfNotExist=true
     username: root
@@ -19,14 +21,12 @@ spring:
     hibernate:
       ddl-auto: update
 
-  eureka:
-    client:
-      service-url:
-        defaultZone: http://localhost:8761/eureka
-
-  server:
-    port: 8082
-
+eureka:
+  client:
+    register-with-eureka: true
+    fetch-registry: true
+    service-url:
+      defaultZone: http://localhost:8761/eureka
 
 resilience4j:
   circuitbreaker:
@@ -34,21 +34,21 @@ resilience4j:
       departmentService:
         registerHealthIndicator: true
         slidingWindowType: COUNT_BASED
-        slidingWindowSize: 10          # last 10 calls track karega
-        minimumNumberOfCalls: 5        # kam se kam 5 calls hone ke baad hi decide karega
-        failureRateThreshold: 50       # agar 50% calls fail huye toh OPEN
-        waitDurationInOpenState: 10s   # 10 sec baad HALF_OPEN try karega
+        slidingWindowSize: 10
+        minimumNumberOfCalls: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
         permittedNumberOfCallsInHalfOpenState: 3
         automaticTransitionFromOpenToHalfOpenEnabled: true
         slowCallRateThreshold: 80
-        slowCallDurationThreshold: 3s  # 3 sec se zyada = slow call maana jayega
+        slowCallDurationThreshold: 3s
 
   ratelimiter:
     instances:
       departmentService:
-        limitForPeriod: 10             # 1 sec mein max 10 calls allowed
+        limitForPeriod: 10
         limitRefreshPeriod: 1s
-        timeoutDuration: 2s            # agar permit nahi mila toh 2 sec wait karega
+        timeoutDuration: 2s
 
   retry:
     instances:
@@ -59,10 +59,7 @@ resilience4j:
           - java.io.IOException
           - feign.RetryableException
         ignoreExceptions:
-           # Dynamic registry se structured client exceptions (jaise DEPT_404):
           - com.keshav.ems.employeeservice.exceptions.client.DepartmentNotFoundException
-          
-          # Feign decoder ki fallback/unknown exception (Empty body, JSON parsing fail, etc.):
           - com.keshav.ems.employeeservice.exceptions.custom.UnknownFeignException
 
   bulkhead:
