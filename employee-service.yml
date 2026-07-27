@@ -20,6 +20,10 @@ spring:
   jpa:
     hibernate:
       ddl-auto: update
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
 
 eureka:
   client:
@@ -28,7 +32,23 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+  endpoint:
+    health:
+      show-details: always
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.springframework.kafka: INFO
+
 resilience4j:
+
   circuitbreaker:
     instances:
       departmentService:
@@ -43,13 +63,6 @@ resilience4j:
         slowCallRateThreshold: 80
         slowCallDurationThreshold: 3s
 
-  ratelimiter:
-    instances:
-      departmentService:
-        limitForPeriod: 10
-        limitRefreshPeriod: 1s
-        timeoutDuration: 2s
-
   retry:
     instances:
       departmentService:
@@ -61,6 +74,13 @@ resilience4j:
         ignoreExceptions:
           - com.keshav.ems.employeeservice.exceptions.client.DepartmentNotFoundException
           - com.keshav.ems.employeeservice.exceptions.custom.UnknownFeignException
+
+  ratelimiter:
+    instances:
+      departmentService:
+        limitForPeriod: 10
+        limitRefreshPeriod: 1s
+        timeoutDuration: 2s
 
   bulkhead:
     instances:
