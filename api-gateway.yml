@@ -16,16 +16,14 @@ spring:
         - id: employee-service
           uri: lb://EMPLOYEE-SERVICE
           predicates:
-            - Path=/api/employees/**
-          filters:
-            - RewritePath=/api/employees/(?<segment>.*), /employees/${segment}
+            - Path=/employees/**
+          
 
         - id: department-service
           uri: lb://DEPARTMENT-SERVICE
           predicates:
-            - Path=/api/departments/**
-          filters:
-            - RewritePath=/api/departments/(?<segment>.*), /departments/${segment}
+            - Path=/departments/**
+         
 
 eureka:
   client:
@@ -34,12 +32,7 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
-management:
-  endpoints:
-    web:
-      exposure:
-        include: health,info,gateway
-
+management: 
   endpoint:
     health:
       show-details: always
