@@ -46,3 +46,4 @@ management:
 logging:
   level:
     org.springframework.kafka: INFO
+    org.springframework.data.mongodb: INFO
