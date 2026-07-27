@@ -12,18 +12,15 @@ spring:
           enabled: false
 
       routes:
-
         - id: employee-service
           uri: lb://EMPLOYEE-SERVICE
           predicates:
             - Path=/employees/**
-          
 
         - id: department-service
           uri: lb://DEPARTMENT-SERVICE
           predicates:
             - Path=/departments/**
-         
 
 eureka:
   client:
@@ -32,11 +29,18 @@ eureka:
     service-url:
       defaultZone: http://localhost:8761/eureka
 
-management: 
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,gateway
+
   endpoint:
     health:
       show-details: always
 
 logging:
   level:
-    org.springframework.cloud.gateway: INFO
+    org.springframework.cloud.gateway: DEBUG
+    org.springframework.cloud.loadbalancer: INFO
+    com.netflix.discovery: INFO
